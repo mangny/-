@@ -118,9 +118,9 @@
             top: 0;
             left: 0;
             padding: 12px;
-            font-size: 16px;
+            font-size: 15px;
             line-height: 28px;
-            font-family: 'Courier New', Consolas, monospace;
+            font-family: 'Courier New', Courier, monospace;
             white-space: pre;
             min-width: 100%;
             box-sizing: border-box;
@@ -130,7 +130,7 @@
             pointer-events: none;
             z-index: 1;
             color: var(--guide-color);
-            opacity: 0.4;
+            opacity: 0.45;
         }
 
         #display-layer {
@@ -145,9 +145,9 @@
             width: 100%;
             height: 100%;
             padding: 12px;
-            font-size: 16px;
+            font-size: 15px;
             line-height: 28px;
-            font-family: 'Courier New', Consolas, monospace;
+            font-family: 'Courier New', Courier, monospace;
             color: transparent;
             background: transparent;
             caret-color: #000000;
@@ -525,7 +525,7 @@
         const targetLines = step.codeLines;
         const typedLines = realInput.value.split('\n');
 
-        // 가이드 레이어 (주석 포함 전체 표시)
+        // 가이드 레이어
         if (toggleGuide.checked) {
             guideLayer.style.display = 'block';
             let guideHTML = '';
@@ -541,7 +541,7 @@
             guideLayer.style.display = 'none';
         }
 
-        // 입력 렌더링 레이어 (주석 출력 금지 -> 중복 방지)
+        // 디스플레이 레이어 (주석 출력 안함)
         let displayHTML = '';
         let totalTypedChars = 0;
         let totalCorrectChars = 0;
@@ -551,7 +551,6 @@
             const targetLine = targetLines[targetIdx];
 
             if (isComment(targetLine)) {
-                // 주석 라인은 display-layer에서 채우지 않고 빈 줄 처리하여 중복 제거
                 displayHTML += '\n';
                 continue;
             }
@@ -590,7 +589,7 @@
 
         displayLayer.innerHTML = displayHTML;
 
-        // 커서 및 높이 정밀 맞춤 (LINE HEIGHT = 28px)
+        // 주석에 따른 입력 상자 오프셋 설정 (줄높이 28px)
         const activeTypedIndex = typedLines.length - 1;
         let matchedTargetIndex = 0;
         let validCodeCount = 0;
