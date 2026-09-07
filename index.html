@@ -160,6 +160,7 @@
             box-sizing: border-box;
         }
 
+        /* 힌트 ON (기본 상태: 초록/빨간색 하이라이트) */
         .char-correct {
             color: var(--correct);
             font-weight: bold;
@@ -171,6 +172,21 @@
             background-color: var(--incorrect-bg);
             font-weight: bold;
             border-radius: 2px;
+        }
+
+        /* 힌트 OFF (색상 미표시) */
+        .no-hint .char-correct,
+        .no-hint .char-incorrect {
+            color: var(--text-main) !important;
+            background-color: transparent !important;
+            font-weight: normal !important;
+        }
+
+        /* ACCURACY 블러 처리 */
+        .blurred {
+            filter: blur(5px);
+            user-select: none;
+            transition: filter 0.2s ease;
         }
 
         .comment-line {
@@ -215,6 +231,12 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 0.5rem;
+        }
+
+        .toggles-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
         .toggle-group {
@@ -336,11 +358,18 @@
         </div>
 
         <div class="controls-row">
-            <label class="toggle-group">
-                <input type="checkbox" id="toggle-guide" checked style="display: none;">
-                <div class="toggle-switch"></div>
-                <span>원문 보이기</span>
-            </label>
+            <div class="toggles-container">
+                <label class="toggle-group">
+                    <input type="checkbox" id="toggle-guide" checked style="display: none;">
+                    <div class="toggle-switch"></div>
+                    <span>원문 보이기</span>
+                </label>
+                <label class="toggle-group">
+                    <input type="checkbox" id="toggle-hint" checked style="display: none;">
+                    <div class="toggle-switch"></div>
+                    <span>힌트</span>
+                </label>
+            </div>
 
             <div class="btn-group">
                 <button class="btn" id="prev-step-btn">← 이전</button>
@@ -449,6 +478,7 @@
     const accuracyVal = document.getElementById('accuracy-val');
     const progressVal = document.getElementById('progress-val');
     const toggleGuide = document.getElementById('toggle-guide');
+    const toggleHint = document.getElementById('toggle-hint');
     const resetBtn = document.getElementById('reset-btn');
     const prevStepBtn = document.getElementById('prev-step-btn');
     const nextStepBtn = document.getElementById('next-step-btn');
@@ -525,7 +555,7 @@
         const targetLines = step.codeLines;
         const typedLines = realInput.value.split('\n');
 
-        // 가이드 레이어
+        // 원문 보이기 온/오프
         if (toggleGuide.checked) {
             guideLayer.style.display = 'block';
             let guideHTML = '';
@@ -541,7 +571,16 @@
             guideLayer.style.display = 'none';
         }
 
-        // 디스플레이 레이어 (주석 출력 안함)
+        // 힌트 온/오프 (색상 표시 & 블러)
+        if (!toggleHint.checked) {
+            displayLayer.classList.add('no-hint');
+            accuracyVal.classList.add('blurred');
+        } else {
+            displayLayer.classList.remove('no-hint');
+            accuracyVal.classList.remove('blurred');
+        }
+
+        // 입력 텍스트 렌더링
         let displayHTML = '';
         let totalTypedChars = 0;
         let totalCorrectChars = 0;
@@ -589,7 +628,7 @@
 
         displayLayer.innerHTML = displayHTML;
 
-        // 주석에 따른 입력 상자 오프셋 설정 (줄높이 28px)
+        // 커서 위치 조절
         const activeTypedIndex = typedLines.length - 1;
         let matchedTargetIndex = 0;
         let validCodeCount = 0;
@@ -674,6 +713,7 @@
 
     realInput.addEventListener('input', updateRenderAndCursor);
     toggleGuide.addEventListener('change', updateRenderAndCursor);
+    toggleHint.addEventListener('change', updateRenderAndCursor);
 
     resetBtn.addEventListener('click', () => {
         realInput.value = '';
